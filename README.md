@@ -3,7 +3,7 @@
 When you run the cells and reach compile step, you are creating a pipeline.yaml file.
 This YAML file is essentially the set of instructions that allows Vertex AI Pipeline Service to execute the ML workflow.
 
-That means I’m not setting up a VM in the background, and I don’t need to worry about security, logging, or orchestration. Instead, I’m simply telling Vertex AI:
+That means you're not setting up a VM in the background, and you don’t need to worry about security, logging, or orchestration. Instead, you're simply telling Vertex AI:
 
 “Hey Vertex AI, execute this pipeline workflow,”
 
