@@ -1,4 +1,4 @@
-*** MLOps on Vertex AI Pipelines***
+# MLOps on Vertex AI Pipelines
 
 When you run the cells and reach compile step, you are creating a pipeline.yaml file.
 This YAML file is essentially the set of instructions that allows Vertex AI Pipeline Service to execute the ML workflow.
