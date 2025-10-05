@@ -1,0 +1,47 @@
+# cloudbuild.yaml (aligned with your notebook names)
+
+substitutions:
+  _PROJECT_ID: 'magnetic-guild-473821-t7'
+  _REGION: 'us-central1'
+  _ARTIFACT_LOCATION: 'us-central1-docker.pkg.dev'
+  _REPO_NAME: 'mlops-artifacts'
+  _IMAGE_NAME: 'mlops-pipeline-image'
+  _TAG: 'v1'
+  _PIPELINE_BUCKET: 'gs://magnetic-guild-473821-t7-mlops-pipelines'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  # 1) Build the Docker image from mlops-cli/Dockerfile
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_ARTIFACT_LOCATION}/${_PROJECT_ID}/${_REPO_NAME}/${_IMAGE_NAME}:${_TAG}
+      - -f
+      - mlops-cli/Dockerfile
+      - mlops-cli
+
+  # 2) Push the image to Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_ARTIFACT_LOCATION}/${_PROJECT_ID}/${_REPO_NAME}/${_IMAGE_NAME}:${_TAG}
+
+  # 3) Run the image once; pipeline.py should write its output to /workspace
+  - name: ${_ARTIFACT_LOCATION}/${_PROJECT_ID}/${_REPO_NAME}/${_IMAGE_NAME}:${_TAG}
+    # If your Dockerfile already sets ENTRYPOINT ["python","pipeline.py"], you can omit args.
+    # If not, uncomment the next line:
+    # args: ["python", "pipeline.py"]
+    env:
+      - PROJECT_ID=${_PROJECT_ID}
+      - REGION=${_REGION}
+      - OUTPUT_PATH=/workspace/xgb-pipeline.yaml
+
+  # 4) Upload the compiled pipeline YAML to your GCS bucket
+  - name: gcr.io/cloud-builders/gsutil
+    args:
+      - cp
+      - /workspace/xgb-pipeline.yaml
+      - ${_PIPELINE_BUCKET}
